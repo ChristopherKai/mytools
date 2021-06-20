@@ -1,0 +1,22 @@
+from pwn import *
+from LibcSearcher import LibcSearcher
+from formatStringExploiter.FormatString import FormatString
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+REMOTE = False
+if args["REMOTE"]: REMOTE = True
+HOST = ""
+PORT = 22
+FILE = os.path.splitext("./"+__file__)[0]
+context.update(arch = 'amd64', os = 'linux', timeout = 100, log_level='debug' )
+elf = ELF(FILE)
+if REMOTE:
+    p = remote(HOST, PORT,buffer_fill_size=0xffff)
+else:
+    context.terminal = ['tmux', 'splitw', '-h']
+    p = process(FILE, buffer_fill_size=0xffff)
+gdb.attach(p,"""
+""")
+pause()
+
+p.interactive()
