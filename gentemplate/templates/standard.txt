@@ -1,22 +1,22 @@
 from pwn import *
 from LibcSearcher import LibcSearcher
 from formatStringExploiter.FormatString import FormatString
+from coolpwn import *
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-REMOTE = False
-if args["REMOTE"]: REMOTE = True
-HOST = ""
-PORT = 22
-FILE = os.path.splitext("./"+__file__)[0]
-context.update(arch = 'amd64', os = 'linux', timeout = 100, log_level='debug' )
-elf = ELF(FILE)
-if REMOTE:
+HOST = ""   # modify
+PORT = 22   # modify
+filename = os.path.splitext("./"+__file__)[0]
+context.update(arch = elf.arch, os = 'linux', timeout = 100, log_level='debug' )
+elf = ELF(filename)
+libc = ELF('/lib/x86_64-linux-gnu/libc.so.6') # modify
+remoteLibc = '' #modify
+ones = [] #modify
+if args["REMOTE"]:
     p = remote(HOST, PORT,buffer_fill_size=0xffff)
 else:
     context.terminal = ['tmux', 'splitw', '-h']
-    p = process(FILE, buffer_fill_size=0xffff)
-gdb.attach(p,"""
-""")
-pause()
+    p = process(FILE,env={'LD_PRELOAD':''}, buffer_fill_size=0xffff)
+ctx = PwnContext(p,elf)
 
 p.interactive()
