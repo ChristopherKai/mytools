@@ -1,0 +1,51 @@
+#!/usr/bin/python
+import sys
+
+PWNDBG_CONFIG = """
+set context-code-lines 5
+set context-sections regs disasm code ghidra stack  expressions
+"""
+
+
+
+PEDA = """
+source /opt/peda/peda.py
+"""
+PWNGDB = """
+source /opt/peda/peda.py
+source /opt/Pwngdb/pwngdb.py
+source /opt/Pwngdb/angelheap/gdbinit.py
+
+define hook-run
+python
+import angelheap
+angelheap.init_angelheap()
+end
+end
+"""
+PWNDBG = """
+source /opt/pwndbg/gdbinit.py
+%s
+""" % (PWNDBG_CONFIG)
+GEF = """
+source /root/.gdbinit-gef.py
+"""
+
+SWITCH_MAP = {
+    "pwngdb":PWNGDB,
+    "peda":PEDA,
+    "gef":GEF,
+    "pwndbg":PWNDBG
+}
+
+GDBINIT = '/root/.gdbinit'
+if len(sys.argv) < 2:
+    print("Usage: ./proc "+"/".join(SWITCH_MAP.keys()))
+    exit(1)
+
+plugin = sys.argv[1]
+cmds = SWITCH_MAP.get(plugin,'')
+
+with open(GDBINIT,'w') as f:
+    f.write(cmds)
+
